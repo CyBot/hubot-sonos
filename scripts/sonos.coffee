@@ -28,10 +28,14 @@ nowPlaying = (msg) ->
 module.exports = (robot) ->
     robot.respond /what'?s playing\??/i, (msg) ->
         nowPlaying msg
+    robot.respond /shut up/i, (msg) ->
+        s.pause()
     robot.respond /pause/i, (msg) ->
-        s.pause() 
+        s.pause()
     robot.respond /play(.*)/i, (msg) ->
         s.play()
+    robot.respond /put something else on/i, (msg) ->
+        s.next()
     robot.respond /next(.*)/i, (msg) ->
         s.next()
     robot.respond /back(.*)/i, (msg) ->
@@ -41,3 +45,7 @@ module.exports = (robot) ->
     robot.respond /volume (.*)/i, (msg) ->
         loudness = msg.match[1]
         s.setVolume loudness
+    robot.respond /turn it down/i, (msg) ->
+        loudness = 40
+        s.setVolume loudness
+        msg.reply('Yeah, that was a bit loud...')
