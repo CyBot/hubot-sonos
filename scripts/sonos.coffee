@@ -35,7 +35,7 @@ module.exports = (robot) ->
     robot.respond /play(.*)/i, (msg) ->
         s.play()
     robot.respond /let's party(.*)/i, (msg) ->
-	      s.setVolume 50
+        s.setVolume 50
         s.play()
     robot.respond /put something else on/i, (msg) ->
         s.next()
