@@ -19,6 +19,7 @@
 
 {Sonos} = require 'sonos'
 s = new Sonos(process.env.HUBOT_SONOS_HOST)
+keeper = null
 
 nowPlaying = (msg) ->
   s.currentTrack (err, track) ->
@@ -28,6 +29,19 @@ nowPlaying = (msg) ->
 module.exports = (robot) ->
     robot.respond /what'?s playing\??/i, (msg) ->
         nowPlaying msg
+    robot.respond /kill keeper/i, (msg) ->
+        clearInterval(keeper) 
+        s.setVolume 20
+    robot.respond /keep volume (.*) (.*)/i, (msg) ->
+        #Keep the volume at the same level for a certain amount of time
+        loudness = msg.match[1]
+        limit = parseInt(msg.match[2])
+        t = 0
+        do loop_volume = ->
+            t += 1
+            clearInterval(keeper) if t > limit
+            s.setVolume loudness
+        keeper = setInterval loop_volume, 3000
     robot.respond /shut up/i, (msg) ->
         s.pause()
     robot.respond /pause/i, (msg) ->
