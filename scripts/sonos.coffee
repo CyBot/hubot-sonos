@@ -26,6 +26,10 @@ nowPlaying = (msg) ->
     msg.send track.artist + " - " + track.title
     msg.send track.albumArtURI
 
+getVol = (msg) ->
+  s.getVolume (err, v) ->
+    msg.send v + "%"
+
 module.exports = (robot) ->
     robot.respond /what'?s playing\??/i, (msg) ->
         nowPlaying msg
@@ -59,6 +63,8 @@ module.exports = (robot) ->
         s.previous()
     robot.respond /previous/i, (msg) ->
         s.previous()
+    robot.respond /get volume/i, (msg) ->
+        getVol msg
     robot.respond /volume (.*)/i, (msg) ->
         loudness = msg.match[1]
         s.setVolume loudness
