@@ -62,9 +62,10 @@ module.exports = (robot) ->
                     s.setVolume loudness
         keeper = setInterval loop_volume, 3000
 
-    robot.respond /fade volume (.*) (.*)/i, (msg) ->
+    robot.respond /fade volume (.*) (.*) (.*)/i, (msg) ->
         final_volume = msg.match[1]
         time_limit = parseInt(msg.match[2])
+        frequency = if msg.match[3]? then parseInt(msg.match[3]) else 3000
         t = 0
 
         # get current volume before initialising fader
@@ -79,7 +80,7 @@ module.exports = (robot) ->
                     clearInterval(keeper)
                 s.setVolume current_vol
 
-            keeper = setInterval fade_volume, 3000
+            keeper = setInterval fade_volume, frequency
 
     robot.respond /shut up/i, (msg) ->
         s.pause()
