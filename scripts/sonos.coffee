@@ -47,7 +47,7 @@ module.exports = (robot) ->
             t += 1
             clearInterval(keeper) if t > limit
             s.setVolume loudness
-        keeper = setInterval loop_volume, 3000
+        keeper = setInterval loop_volume, 1000
 
     robot.respond /limit volume (.*) (.*)/i, (msg) ->
         #Limit the volume to remain below a particular level for a certain amount of time
@@ -60,27 +60,28 @@ module.exports = (robot) ->
             s.getVolume (err, v) ->
                 if v > loudness
                     s.setVolume loudness
-        keeper = setInterval loop_volume, 3000
+        keeper = setInterval loop_volume, 1000
 
     robot.respond /fade volume (.*) (.*) (.*)/i, (msg) ->
         final_volume = msg.match[1]
-        time_limit = parseInt(msg.match[2])
-        frequency = if msg.match[3]? then parseInt(msg.match[3]) else 3000
-        t = 0
+        time_limit_sec = parseInt(msg.match[2])
+        frequency_sec = if msg.match[3]? then parseInt(msg.match[3]) else 1
+        frequency_millis = frequency_sec * 1000
+        time_elapsed_sec = 0
 
         # get current volume before initialising fader
         s.getVolume (err, v) ->
             current_vol = v
             # repeatedly reduce volume until final value is reached
             fade_volume = ->
-                t += 1
+                time_elapsed_sec += frequency_sec
                 if current_vol > final_volume
                     current_vol -= 1
-                if t > time_limit
+                if time_elapsed_sec > time_limit_sec
                     clearInterval(keeper)
                 s.setVolume current_vol
 
-            keeper = setInterval fade_volume, frequency
+            keeper = setInterval fade_volume, frequency_millis
 
     robot.respond /shut up/i, (msg) ->
         s.pause()
