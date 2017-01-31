@@ -1,6 +1,6 @@
 {
   "name": "hubot-sonos",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Control your sonos device with hubot",
   "main": "index.coffee",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/markhuge/hubot-sonos.git"
+    "url": "https://github.com/CyBot/hubot-sonos.git"
   },
   "keywords": [
     "hubot",
@@ -16,11 +16,16 @@
     "music"
   ],
   "author": "Mark Wilkerson <mark@segfawlt.net>",
+  "contributors": [
+    "Ben Elliott",
+    "Carles Cerezo Guzmán",
+    "CyBot <cybot@cybot.eu.org>"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/markhuge/hubot-sonos/issues"
+    "url": "https://github.com/CyBot/hubot-sonos/issues"
   },
-  "homepage": "https://github.com/markhuge/hubot-sonos",
+  "homepage": "https://github.com/CyBot/hubot-sonos",
   "dependencies": {
     "sonos": "^0.7.0"
   }
