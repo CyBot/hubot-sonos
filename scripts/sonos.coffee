@@ -19,13 +19,28 @@
 
 {Sonos} = require 'sonos'
 s = new Sonos(process.env.HUBOT_SONOS_HOST)
+http = require 'http'
 
-nowPlaying = (msg) ->
+nowPlaying = (msg, robot) ->
   s.currentTrack (err, track) ->
     aa = track.albumArtURI
+    title = track.artist + " - " + track.title
     aa = "http://" + process.env.HUBOT_SONOS_HOST + ":1400" + aa if aa.startsWith("/")
-    msg.send track.artist + " - " + track.title
-    msg.send aa
+    msg.send title
+    #msg.send aa
+    filename = title + ".jpg"
+    http.get aa, (resp) ->
+      if resp.statusCode isnt 200
+        msg.send "Error loading album art (#{resp.statusCode})"
+        return
+      contentOpts =
+        file: resp
+        title: title
+        channels: msg.message.room
+      robot.adapter.client.web.files.upload filename, contentOpts, (err, res) ->
+        if err
+          msg.send "Error loading album art (#{err})"
+          return
 
 getVol = (msg) ->
   s.getVolume (err, v) ->
@@ -33,9 +48,9 @@ getVol = (msg) ->
 
 module.exports = (robot) ->
     robot.respond /what'?s playing\??/i, (msg) ->
-        nowPlaying msg
+        nowPlaying msg, robot
     robot.respond /was ist das\??/i, (msg) ->
-        nowPlaying msg
+        nowPlaying msg, robot
 
     robot.respond /shut up/i, (msg) ->
         s.pause()
