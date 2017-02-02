@@ -22,8 +22,10 @@ s = new Sonos(process.env.HUBOT_SONOS_HOST)
 
 nowPlaying = (msg) ->
   s.currentTrack (err, track) ->
+    aa = track.albumArtURI
+    aa = "http://" + process.env.HUBOT_SONOS_HOST + ":1400" + aa if aa.startsWith("/")
     msg.send track.artist + " - " + track.title
-    msg.send track.albumArtURI
+    msg.send aa
 
 getVol = (msg) ->
   s.getVolume (err, v) ->
