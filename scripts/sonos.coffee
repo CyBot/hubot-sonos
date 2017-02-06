@@ -89,8 +89,10 @@ module.exports = (robot) ->
         s.reply(':beers:')
 
     robot.respond /turn it down/i, (msg) ->
-        s.setVolume 25
+        s.getVolume (err, v) ->
+            s.setVolume 25 if v > 25
         msg.reply('Yeah, that was a bit loud...')
     robot.hear /leiser/i, (msg) ->
-        s.setVolume 25
+        s.getVolume (err, v) ->
+            s.setVolume 25 if v > 25
         msg.reply('Besser?')
