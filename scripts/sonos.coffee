@@ -64,7 +64,11 @@ module.exports = (robot) ->
 
     robot.respond /next(.*)/i, (msg) ->
         s.next()
+    robot.respond /weiter(.*)/i, (msg) ->
+        s.next()
     robot.respond /put something else on/i, (msg) ->
+        s.next()
+    robot.respond /spiel was anderes/i, (msg) ->
         s.next()
 
     robot.respond /back(.*)/i, (msg) ->
