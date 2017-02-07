@@ -18,14 +18,14 @@
 
 
 {Sonos} = require 'sonos'
-s = new Sonos(process.env.HUBOT_SONOS_HOST)
+s = new Sonos process.env.HUBOT_SONOS_HOST
 http = require 'http'
 
 nowPlaying = (msg, robot) ->
   s.currentTrack (err, track) ->
     aa = track.albumArtURI
     title = track.artist + " - " + track.title
-    aa = "http://" + process.env.HUBOT_SONOS_HOST + ":1400" + aa if aa.startsWith("/")
+    aa = "http://" + process.env.HUBOT_SONOS_HOST + ":1400" + aa if aa.startsWith "/"
     msg.send title
     #msg.send aa
     filename = title + ".jpg"
@@ -86,13 +86,13 @@ module.exports = (robot) ->
     robot.hear /party/i, (msg) ->
         s.setVolume 50
         s.play()
-        s.reply(':beers:')
+        s.reply ':beers:'
 
     robot.respond /turn it down/i, (msg) ->
         s.getVolume (err, v) ->
             s.setVolume 25 if v > 25
-        msg.reply('Yeah, that was a bit loud...')
+        msg.reply 'Yeah, that was a bit loud...'
     robot.hear /leiser/i, (msg) ->
         s.getVolume (err, v) ->
             s.setVolume 25 if v > 25
-        msg.reply('Besser?')
+        msg.reply 'Besser?'
