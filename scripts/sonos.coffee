@@ -23,14 +23,13 @@ http = require 'http'
 
 nowPlaying = (msg, robot) ->
   s.currentTrack (err, track) ->
-    aa = track.albumArtURI
-    title = track.artist + " - " + track.title
-    album = track.artist + " - " + track.album
-    aa = "http://" + process.env.HUBOT_SONOS_HOST + ":1400" + aa if aa.startsWith "/"
+    aa = track.albumArtURL
+    title = (track.artist ? "Unknown") + " - " + (track.title ? "Unknown")
+    album = (track.artist ? "Unknown") + " - " + (track.album ? "Unknown")
     msg.send title
     #msg.send aa
     filename = album + ".jpg"
-    http.get aa, (resp) ->
+    if aa then http.get aa, (resp) ->
       if resp.statusCode isnt 200
         msg.send "Error loading album art (#{resp.statusCode})"
         return
