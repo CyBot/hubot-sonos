@@ -1,6 +1,6 @@
 {
   "name": "hubot-sonos",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Control your sonos device with hubot",
   "main": "index.coffee",
   "scripts": {
