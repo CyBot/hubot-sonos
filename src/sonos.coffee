@@ -20,6 +20,11 @@
 {Sonos} = require 'sonos'
 s = new Sonos process.env.HUBOT_SONOS_HOST
 http = require 'http'
+spotify = require 'spotify-finder'
+sp = new spotify consumer:
+	key: process.env.HUBOT_SPOTIFY_ID
+	secret: process.env.HUBOT_SPOTIFY_SECRET
+emo = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'keycap_ten']
 
 nowPlaying = (msg, robot) ->
 	s.currentTrack (err, track) ->
@@ -33,14 +38,47 @@ nowPlaying = (msg, robot) ->
 			if resp.statusCode isnt 200
 				msg.send "Error loading album art (#{resp.statusCode})"
 				return
-			contentOpts =
-				file: resp
-				title: album
-				channels: msg.message.room
-			robot.adapter.client.web.files.upload filename, contentOpts, (err, res) ->
+			robot.adapter.client.web.files.upload filename, file: resp, title: album, channels: msg.message.room, (err, res) ->
 				if err
 					msg.send "Error loading album art (#{err})"
 					return
+
+search = (msg, robot) ->
+	query = msg.match[1]
+	if !query
+		msg.reply 'Usage: search [album|artist|playlist|track] [search term]'
+		return
+	query = query.split ' '
+	type = query[0].toLowerCase()
+	if type not in ['album', 'artist', 'playlist', 'track']
+		msg.reply 'Usage: search [album|artist|playlist|track] [search term]'
+		return
+	query.shift()
+	query = query.join ' '
+	if !query
+		msg.reply 'Usage: search [album|artist|playlist|track] [search term]'
+		return
+	sp.search(
+		q: query,
+		type: type,
+		country: 'from_token',
+		limit: 5
+	).then (data) ->
+		result = data[type + 's'].items
+		i = 0
+		reply = ''
+		for r in result
+			reply += '\n' if reply
+			reply += ":#{emo[i++]}: #{r.name}"
+		robot.adapter.client.web.chat.postMessage(msg.message.room, reply, as_user: true, link_names: 1).then (data) ->
+			robot.brain.set 'sonos.lastSearch',
+				channel: msg.message.room,
+				user: msg.message.user.id,
+				ts: data.ts,
+				type: type,
+				result: result
+			for i in [result.length-1..0]
+				robot.adapter.client.web.reactions.add emo[i], channel: msg.message.room, timestamp: data.ts
 
 getVol = (msg) ->
 	s.getVolume (err, v) ->
@@ -96,3 +134,19 @@ module.exports = (robot) ->
 		s.getVolume (err, v) ->
 			s.setVolume 25 if v > 25
 		msg.reply 'Besser?'
+
+	robot.respond /search ?(.*)/i, (msg) ->
+		search msg, robot
+
+	robot.react (msg) ->
+		return if msg.message.item_user.id isnt robot.adapter.self.id
+		lastsearch = robot.brain.get 'sonos.lastSearch'
+		return if !lastsearch
+		return if lastsearch.channel isnt msg.message.room
+		return if lastsearch.ts isnt msg.message.item.ts
+		i = emo.indexOf msg.message.reaction
+		return if i is -1
+		robot.brain.set 'sonos.lastSearch', {}
+		s.addSpotifyQueue lastsearch.result[i].id, (err, res) -> msg.send "Error: #{err}" if err
+#		s.play()
+#		lastsearch.result[i].uri, (err, res) -> msg.send "Error: #{err}" if err

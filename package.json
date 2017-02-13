@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/CyBot/hubot-sonos",
   "dependencies": {
-    "sonos": "^0.7.0"
+    "sonos": "^0.14.1",
+    "spotify-finder": "^2.0.2"
   }
 }
